@@ -1,4 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, createContext, useContext, useEffect, ReactNode } from 'react';
+import { auth, db } from '../firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
+import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    updateProfile,
+    setPersistence,
+    browserLocalPersistence,
+} from 'firebase/auth';
 
 interface User {
     email: string;
@@ -7,63 +18,95 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
+    login: (email: string, password: string) => Promise<void>;
+    signup: (email: string, password: string, name: string) => Promise<void>;
+    logout: () => Promise<void>;
     isAuthenticated: boolean;
-    login: (user: User) => void;
-    logout: () => void;
+    loading: boolean; // 👈 added
 }
 
-const AuthContext = createContext<AuthContextType>({
-    user: null,
-    isAuthenticated: false,
-    login: () => {},
-    logout: () => {}
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error('useAuth must be used within an AuthProvider');
     return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+    children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true); // 👈 added
 
     useEffect(() => {
-        // Check for stored auth state
-        const authState = localStorage.getItem('agriverse_auth');
-        const userData = localStorage.getItem('agriverse_user');
+        // Ensure persistence across reloads (optional, safe to call once)
+        setPersistence(auth, browserLocalPersistence).catch(() => { /* ignore */ });
 
-        if (authState === 'true' && userData) {
-            try {
-                const parsedUser = JSON.parse(userData);
-                setUser(parsedUser);
-                setIsAuthenticated(true);
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                logout();
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            if (firebaseUser) {
+                setUser({
+                    email: firebaseUser.email || '',
+                    name:
+                        firebaseUser.displayName ||
+                        firebaseUser.email?.split('@')[0] ||
+                        'User',
+                });
+                localStorage.setItem('uid', firebaseUser.uid);
+            } else {
+                setUser(null);
+                localStorage.removeItem('uid');
             }
-        }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    const login = (userData: User) => {
-        setUser(userData);
-        setIsAuthenticated(true);
-        localStorage.setItem('agriverse_auth', 'true');
-        localStorage.setItem('agriverse_user', JSON.stringify(userData));
+    const login = async (email: string, password: string) => {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        const fbUser = result.user;
+        localStorage.setItem('uid', fbUser.uid);
+        setUser({
+            email: fbUser.email || '',
+            name: fbUser.displayName || email.split('@')[0],
+        });
     };
 
-    const logout = () => {
+    const signup = async (email: string, password: string, name: string) => {
+        const res = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(res.user, { displayName: name });
+
+        await setDoc(doc(db, 'users', res.user.uid), {
+            uid: res.user.uid,
+            email: res.user.email,
+            name,
+            createdAt: new Date(),
+        });
+        localStorage.setItem('uid', res.user.uid);
+
+        setUser({ email: res.user.email || '', name });
+    };
+
+    const logout = async () => {
+        await signOut(auth);
+        localStorage.removeItem('uid');
         setUser(null);
-        setIsAuthenticated(false);
-        localStorage.removeItem('agriverse_auth');
-        localStorage.removeItem('agriverse_user');
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                login,
+                signup,
+                logout,
+                isAuthenticated: !!user,
+                loading,
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

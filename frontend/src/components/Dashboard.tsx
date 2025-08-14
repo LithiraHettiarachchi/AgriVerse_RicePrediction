@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -78,6 +78,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     { region: 'Central Province', condition: 'Rainy', temp: '24°C', icon: CloudRain },
     { region: 'Southern Province', condition: 'Cloudy', temp: '26°C', icon: Sun },
   ];
+
+  useEffect(() => {
+    console.log('UID:', localStorage.getItem('uid'));
+  }, []);
+
 
   return (
     <div className="space-y-6">
