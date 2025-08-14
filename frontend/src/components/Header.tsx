@@ -32,12 +32,15 @@ export const Header: React.FC<HeaderProps> = ({
   const years = ['2023', '2024', '2025', '2026'];
   const {
     user,
-    logout
+    logout,
+    isAuthenticated
   } = useAuth();
   const navigate = useNavigate();
   const handleLogout = () => {
     logout();
+    localStorage.removeItem('uid');
     navigate('/login');
+    window.location.reload();
   };
 
   return (
