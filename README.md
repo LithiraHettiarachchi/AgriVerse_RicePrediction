@@ -1,7 +1,7 @@
 # 🌾 AgriVerse - Rice Production Forecast Dashboard
 
 AgriVerse is a modern and responsive **full-stack** web application designed to **monitor and predict rice production trends across Sri Lanka**.  
-It uses historical production data, weather insights, and machine learning models to generate **accurate rice yield forecasts** for the **Maha** and **Yala** seasons.
+It uses historical production data and machine learning models to generate **accurate rice yield forecasts** for the **Maha** and **Yala** seasons.
 
 ---
 
@@ -32,7 +32,6 @@ It uses historical production data, weather insights, and machine learning model
 - 🧠 **Machine Learning Model Integration** (Yala & Maha season models)
 - 🔥 **Firebase Authentication** (Google Sign-in & Email/Password)
 - 🗄️ **Firestore Database** for storing user predictions & history
-- 🌦️ **Weather Data Integration**
 - 📡 **RESTful API** with FastAPI
 - 📂 **Prediction History Management**
 - 🔐 **JWT-based Authentication**
@@ -75,10 +74,11 @@ AgriVerse_RicePrediction/
 │
 ├── backend/            # FastAPI backend
 │   ├── app/
-│   │   ├── routes/     # API endpoints
-│   │   ├── utils/      # Firebase config, helper functions
-│   │   ├── ml_models/  # Pre-trained model files (.pkl)
-│   │   └── main.py     # Application entry point
+│   │   ├── routes/      # API endpoints
+│   │   ├── utils/       # Firebase config, helper functions
+│   │   ├── services/    # Business logic / ML prediction functions
+│   │   ├── ml_models/   # Pre-trained model files (.pkl)
+│   │   └── main.py      # Application entry point
 │   ├── requirements.txt
 │   └── run.py
 │
@@ -125,7 +125,6 @@ uvicorn app.main:app --reload
 | POST   | /production/predict             | Make a rice production prediction (Yala/Maha)   |
 | GET    | /production/my                  | Get all predictions for the authenticated user  |
 | GET    | /production/my/{prediction_id}  | Get a single prediction by ID for the user      |
-| GET    | /weather/{district}             | Get latest weather info for a district          |
 
 ## 📊 Machine Learning Models
 
