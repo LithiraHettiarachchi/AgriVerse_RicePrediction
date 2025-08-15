@@ -28,10 +28,11 @@ def predict_and_save(
         data.year, data.season, data.district, data.sown_hect, data.previous_yield, data.previous_production
     )
 
-    # Save to Firestore
-    doc_ref = db.collection("users").document(uid).collection("predictions").document()
+    # Save to Firestore (top-level predictions collection)
+    doc_ref = db.collection("predictions").document()  # No nesting inside users
     doc_ref.set({
         "prediction_id": doc_ref.id,
+        "uid": uid,  # Keep reference to the user
         "year": data.year,
         "season": data.season,
         "district": data.district,
@@ -54,7 +55,7 @@ def predict_and_save(
 def get_my_predictions(uid: str = Depends(get_current_user)):
     """Fetch all predictions for the authenticated user."""
     try:
-        predictions_ref = db.collection("users").document(uid).collection("predictions")
+        predictions_ref = db.collection("predictions").where("uid", "==", uid)
         docs = predictions_ref.stream()
 
         predictions = []
@@ -79,13 +80,18 @@ def get_my_prediction_by_id(
 ):
     """Fetch a single prediction for the authenticated user by its ID."""
     try:
-        doc_ref = db.collection("users").document(uid).collection("predictions").document(prediction_id)
+        doc_ref = db.collection("predictions").document(prediction_id)
         doc = doc_ref.get()
 
         if not doc.exists:
             raise HTTPException(status_code=404, detail="Prediction not found")
 
         pred_data = doc.to_dict()
+
+        # Ensure the prediction belongs to the current user
+        if pred_data.get("uid") != uid:
+            raise HTTPException(status_code=403, detail="Not authorized to access this prediction")
+
         pred_data["id"] = doc.id
         return {
             "status": "success",
