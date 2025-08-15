@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/agriverse-bcdea-firebase-adminsdk-fbsvc-f6cbc786f0.json
+      - FIREBASE_PROJECT_ID=agriverse-bcdea
+      - FIREBASE_CLIENT_EMAIL=pasinduwimalarathne2000@gmail.com
+      - FIREBASE_PRIVATE_KEY=AIzaSyCEVYDMEZPeznp3oGksc8eqAtRy67lxlz8
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: react-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
