@@ -2,13 +2,12 @@ import joblib
 
 models = {
     'Yala': {
-        'extent': joblib.load("app/ml_models/model_extent(Yala).pkl"),
-        'production': joblib.load("app/ml_models/model_production(Yala).pkl")
+        'extent': joblib.load("app/ml_models/model_extent_compressed(Yala).pkl"),
+        'production': joblib.load("app/ml_models/model_prodiction_compressed(Yala).pkl")
     },
-    # 'Maha': {
-    #     'extent': joblib.load("app/ml_models/model_extent(Maha).pkl"),
-    #     'production': joblib.load("app/ml_models/model_production(Maha).pkl")
-    # }
+    'Maha': {
+        'production': joblib.load("app/ml_models/model_compressed(Maha).pkl")
+    }
 }
 
 def get_models(season: str):

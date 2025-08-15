@@ -2,7 +2,7 @@ fastapi
 uvicorn
 joblib
 pandas
-sqlalchemy
 passlib[bcrypt]
 python-multipart
 firebase-admin
+catboost

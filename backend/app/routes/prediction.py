@@ -25,7 +25,7 @@ def predict_and_save(
 ):
     # Run prediction
     extent, production = predict_total_production(
-        data.year, data.season, data.district, data.sown_hect, data.previous_yield
+        data.year, data.season, data.district, data.sown_hect, data.previous_yield, data.previous_production
     )
 
     # Save to Firestore

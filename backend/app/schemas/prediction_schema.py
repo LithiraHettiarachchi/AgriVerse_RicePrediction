@@ -6,6 +6,7 @@ class PredictionInput(BaseModel):
     district: str
     sown_hect: float
     previous_yield: float
+    previous_production: float
 
 class PredictionRecord(BaseModel):
     season: str
