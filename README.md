@@ -13,12 +13,8 @@ It uses historical production data, weather insights, and machine learning model
 - [🚀 Getting Started](#-getting-started)
   - [Frontend Setup](#frontend-setup)
   - [Backend Setup](#backend-setup)
-- [🔧 Available Scripts](#-available-scripts)
 - [📡 API Endpoints](#-api-endpoints)
 - [📊 Machine Learning Models](#-machine-learning-models)
-- [🛠 Environment Variables](#-environment-variables)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
 
 ---
 
@@ -118,6 +114,28 @@ pip install -r requirements.txt
 
 # Run FastAPI server
 uvicorn app.main:app --reload
+```
+
+## 📡 API Endpoints
+
+| Method | Endpoint                        | Description                                      |
+|--------|---------------------------------|--------------------------------------------------|
+| POST   | /auth/login                     | User login                                       |
+| POST   | /auth/google                    | Google Sign-in                                   |
+| POST   | /production/predict             | Make a rice production prediction (Yala/Maha)   |
+| GET    | /production/my                  | Get all predictions for the authenticated user  |
+| GET    | /production/my/{prediction_id}  | Get a single prediction by ID for the user      |
+| GET    | /weather/{district}             | Get latest weather info for a district          |
+
+## 📊 Machine Learning Models
+
+### Yala Season Models
+- `model_extent_compressed(Yala).pkl`
+- `model_prodiction_compressed(Yala).pkl`
+
+### Maha Season Model
+- `model_compressed(Maha).pkl`
+
 
 
 
