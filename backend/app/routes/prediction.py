@@ -6,6 +6,7 @@ from datetime import datetime
 
 router = APIRouter()
 
+
 def get_current_user(authorization: str = Header(...)):
     """Extract UID from Firebase ID token."""
     if not authorization.startswith("Bearer "):
@@ -16,17 +17,18 @@ def get_current_user(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return decoded["uid"]
 
-@router.post("/predict")
+
+@router.post("/production/predict")
 def predict_and_save(
-    data: PredictionInput,
-    uid: str = Depends(get_current_user),
+        data: PredictionInput,
+        uid: str = Depends(get_current_user),
 ):
-    # 1. Run prediction
+    # Run prediction
     extent, production = predict_total_production(
         data.year, data.season, data.district, data.sown_hect, data.previous_yield
     )
 
-    # 2. Save to Firestore in a user-specific collection
+    # Save to Firestore
     doc_ref = db.collection("users").document(uid).collection("predictions").document()
     doc_ref.set({
         "prediction_id": doc_ref.id,
@@ -40,7 +42,6 @@ def predict_and_save(
         "createdAt": datetime.utcnow().isoformat()
     })
 
-    # 3. Return results
     return {
         "status": "success",
         "prediction_id": doc_ref.id,
@@ -48,3 +49,48 @@ def predict_and_save(
         "Predicted Total Production (metric tons)": production
     }
 
+
+@router.get("/production/my")
+def get_my_predictions(uid: str = Depends(get_current_user)):
+    """Fetch all predictions for the authenticated user."""
+    try:
+        predictions_ref = db.collection("users").document(uid).collection("predictions")
+        docs = predictions_ref.stream()
+
+        predictions = []
+        for doc in docs:
+            pred_data = doc.to_dict()
+            pred_data["id"] = doc.id
+            predictions.append(pred_data)
+
+        return {
+            "status": "success",
+            "count": len(predictions),
+            "predictions": predictions
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching predictions: {str(e)}")
+
+
+@router.get("/production/my/{prediction_id}")
+def get_my_prediction_by_id(
+        prediction_id: str,
+        uid: str = Depends(get_current_user),
+):
+    """Fetch a single prediction for the authenticated user by its ID."""
+    try:
+        doc_ref = db.collection("users").document(uid).collection("predictions").document(prediction_id)
+        doc = doc_ref.get()
+
+        if not doc.exists:
+            raise HTTPException(status_code=404, detail="Prediction not found")
+
+        pred_data = doc.to_dict()
+        pred_data["id"] = doc.id
+        return {
+            "status": "success",
+            "prediction": pred_data
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching prediction: {str(e)}")
