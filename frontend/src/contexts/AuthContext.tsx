@@ -72,7 +72,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const result = await signInWithEmailAndPassword(auth, email, password);
         const fbUser = result.user;
         localStorage.setItem('uid', fbUser.uid);
-        console.log("LOG 2 :", fbUser);
+        localStorage.setItem('accTok', fbUser.accessToken);
+        // console.log("LOG 2 :", fbUser.accessToken);
         setUser({
             email: fbUser.email || '',
             name: fbUser.displayName || email.split('@')[0],
@@ -90,6 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             createdAt: new Date(),
         });
         localStorage.setItem('uid', res.user.uid);
+        localStorage.setItem('accTok', res.user.accessToken);
         // console.log("LOG3 :", res)
 
         setUser({ email: res.user.email || '', name });
