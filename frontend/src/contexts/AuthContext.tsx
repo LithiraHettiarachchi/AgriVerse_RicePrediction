@@ -55,9 +55,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         'User',
                 });
                 localStorage.setItem('uid', firebaseUser.uid);
+                localStorage.setItem('accTok', firebaseUser.accessToken);
+                // console.log("LOG 1 :", firebaseUser.accessToken);
             } else {
                 setUser(null);
                 localStorage.removeItem('uid');
+                localStorage.removeItem('accTok');
             }
             setLoading(false);
         });
@@ -69,6 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const result = await signInWithEmailAndPassword(auth, email, password);
         const fbUser = result.user;
         localStorage.setItem('uid', fbUser.uid);
+        console.log("LOG 2 :", fbUser);
         setUser({
             email: fbUser.email || '',
             name: fbUser.displayName || email.split('@')[0],
@@ -86,6 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             createdAt: new Date(),
         });
         localStorage.setItem('uid', res.user.uid);
+        // console.log("LOG3 :", res)
 
         setUser({ email: res.user.email || '', name });
     };
@@ -93,6 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = async () => {
         await signOut(auth);
         localStorage.removeItem('uid');
+        localStorage.removeItem('accTok');
         setUser(null);
     };
 
