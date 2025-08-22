@@ -5,9 +5,8 @@ import { TrendingUp, Wheat, Sprout } from 'lucide-react';
 
 interface PredictionOutputProps {
   data: {
-    predictedProduction: string;
-    predictedYield: string;
-    harvestedExtent: string;
+    predTot: string;
+    predHav: string;
     district: string;
     season: string;
     year: string;
@@ -16,18 +15,10 @@ interface PredictionOutputProps {
 
 export const PredictionOutput: React.FC<PredictionOutputProps> = ({ data }) => {
   const outputCards = [
-    {
-      title: 'Predicted Production',
-      value: `${data.predictedProduction} MT`,
-      icon: Wheat,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
-      description: 'Total rice production forecast'
-    },
+
     {
       title: 'Predicted Yield',
-      value: `${data.predictedYield} MT/Ha`,
+      value: `${data.predTot} MT`,
       icon: TrendingUp,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
@@ -36,7 +27,7 @@ export const PredictionOutput: React.FC<PredictionOutputProps> = ({ data }) => {
     },
     {
       title: 'Harvested Extent',
-      value: `${data.harvestedExtent} Ha`,
+      value: `${data.predHav} Ha`,
       icon: Sprout,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
@@ -44,6 +35,7 @@ export const PredictionOutput: React.FC<PredictionOutputProps> = ({ data }) => {
       description: 'Expected harvested area'
     }
   ];
+  console.log("NEW",data)
 
   return (
     <div className="space-y-6">
@@ -56,7 +48,7 @@ export const PredictionOutput: React.FC<PredictionOutputProps> = ({ data }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {outputCards.map((card, index) => (
           <Card 
             key={index} 

@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 });
                 localStorage.setItem('uid', firebaseUser.uid);
                 localStorage.setItem('accTok', firebaseUser.accessToken);
-                // console.log("LOG 1 :", firebaseUser.accessToken);
+                console.log("LOG 1 :", firebaseUser.accessToken);
             } else {
                 setUser(null);
                 localStorage.removeItem('uid');

@@ -20,11 +20,11 @@ const Index = () => {
   const [selectedYear, setSelectedYear] = useState('2025');
 
   const handlePrediction = (formData: any) => {
+    console.log("DATA", formData);
     // Simulate prediction with realistic values
     const mockPrediction = {
-      predictedProduction: (Math.random() * 5000 + 2000).toFixed(0),
-      predictedYield: (Math.random() * 2 + 3).toFixed(2),
-      harvestedExtent: (formData.sownExtent * (0.85 + Math.random() * 0.1)).toFixed(0),
+      predTot: formData.predTot,
+      predHav: formData.predHav,
       district: formData.district,
       season: formData.season,
       year: formData.year
@@ -43,7 +43,7 @@ const Index = () => {
             {predictionData && (
               <>
                 <PredictionOutput data={predictionData} />
-                <ChartSection data={predictionData} />
+                {/*<ChartSection data={predictionData} />*/}
               </>
             )}
           </div>
