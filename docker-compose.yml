@@ -13,6 +13,7 @@ services:
       - FIREBASE_PRIVATE_KEY=AIzaSyCEVYDMEZPeznp3oGksc8eqAtRy67lxlz8
     volumes:
       - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - app-network
 
@@ -20,7 +21,7 @@ services:
     build: ./frontend
     container_name: react-frontend
     ports:
-      - "3000:80"
+      - "3000:80"   # Map localhost:3000 → Nginx:80
     depends_on:
       - backend
     networks:
@@ -29,3 +30,4 @@ services:
 networks:
   app-network:
     driver: bridge
+
